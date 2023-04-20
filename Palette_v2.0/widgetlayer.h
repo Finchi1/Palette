@@ -1,0 +1,70 @@
+#pragma once
+
+#include <QWidget>
+#include "framelayer.h"
+#include "system.h"
+#include <QPushButton>
+#include <QApplication>
+#include <QLabel>
+#include <QSpinBox>
+#include <QSpinBox>
+#include <QStatusBar>
+#include "colored_circle.h"
+#include "monitorframe.h"
+
+class WidgetLayer : public QWidget
+{
+	Q_OBJECT
+
+public:
+	explicit WidgetLayer(QWidget* parent = nullptr);
+	virtual ~WidgetLayer();
+
+	void setDefaultSizeMargin(const int margin) { mResizingFrame->setDefaultSizeMargin(margin); }
+	void setFrameColor(const QColor color) { mResizingFrame->setPenColor(color); }
+	void setFrameWidth(const qreal width) { mResizingFrame->setPenWidth(width); }
+	void setMainRectColor(const QColor color) {}
+	void setBlurBehind(bool blured) { mBlurBehind = blured; mNativeEventClear = true; }
+
+protected:
+	void paintEvent(QPaintEvent* event) override;
+	void resizeEvent(QResizeEvent* event) override;
+	bool nativeEvent(const QByteArray& eventType, void* message, qintptr* result) override;
+	void hideEvent(QHideEvent* event) override;
+	void showEvent(QShowEvent* event) override;
+
+private:
+	void setWindowBlur(HWND hWnd, int state = 3); // state = 3 - it's blur behind effect
+	QString intToHex(int value);
+
+private:
+	FrameLayer* mResizingFrame{ nullptr };
+	QPushButton* mBtnClose{ nullptr };
+	QPushButton* mBtnMaximize{ nullptr };
+	QPushButton* mBtnMinimize{ nullptr };
+	bool mIsFrameResizing{ false };
+	MoveType mAction{ MoveType::NO_ACTION };
+	QColor mMainRectColor{ QColor(45,45,45,1) };
+	QColor mSystemPanelColor{ QColor(25, 25, 25, 255) };
+	QSize mSystemButtonsSize{ QSize(45, 40) };
+	bool mFixedSize{ false };
+	bool mBlurBehind{ false };
+	bool mNativeEventClear{ false };
+
+	// Widget content
+	ColoredCircle* circle{ nullptr };
+	QLabel* labelR{ nullptr };
+	QLabel* labelG{ nullptr };
+	QLabel* labelB{ nullptr };
+	QLabel* labelA{ nullptr };
+	QSpinBox* spinBoxR{ nullptr };
+	QSpinBox* spinBoxG{ nullptr };
+	QSpinBox* spinBoxB{ nullptr };
+	QSpinBox* spinBoxA{ nullptr };
+	QLabel* labelColor{ nullptr };
+	QStatusBar* statusBar{ nullptr };
+	QPushButton* monitorColor{ nullptr };
+
+	//Monitor frame
+	MonitorFrame* monitorFrame{ nullptr };
+};
